@@ -11,6 +11,7 @@ import SearchBar from "@/components/SearchBar";
 import { useTransactionContext } from "@/contexts/TransactionContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import gsap from "gsap";
+import { Transaction, TransactionFormData } from "@/types/transactions";
 
 export default function DTMoney() {
   const {

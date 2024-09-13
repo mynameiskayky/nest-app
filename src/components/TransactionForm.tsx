@@ -1,105 +1,160 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Transaction, TransactionFormData } from "@/types/transactions";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { TransactionFormData } from "@/types/transactions";
+import { useTransactionContext } from "@/contexts/TransactionContext";
 
-type TransactionFormProps = {
+const formSchema = z.object({
+  title: z.string().min(1, "O título é obrigatório"),
+  amount: z.number().min(0.01, "O valor deve ser maior que zero"),
+  category: z.string().min(1, "A categoria é obrigatória"),
+  type: z.enum(["income", "expense"]),
+  date: z.string().min(1, "A data é obrigatória"),
+});
+
+interface TransactionFormProps {
   onSubmit: (data: TransactionFormData) => void;
-  initialData?: Transaction | null;
-};
+  initialData?: TransactionFormData;
+}
 
-export default function TransactionForm({
+const TransactionForm: React.FC<TransactionFormProps> = ({
   onSubmit,
   initialData,
-}: TransactionFormProps) {
-  const [title, setTitle] = useState(initialData?.title || "");
-  const [amount, setAmount] = useState(initialData?.amount.toString() || "");
-  const [category, setCategory] = useState(initialData?.category || "");
-  const [type, setType] = useState<"income" | "expense">(
-    initialData?.type || "income"
-  );
+}) => {
+  const { categories } = useTransactionContext();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      title,
-      amount: parseFloat(amount),
-      category,
-      type,
-    });
-  };
+  const form = useForm<TransactionFormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialData || {
+      title: "",
+      amount: 0,
+      category: "",
+      type: "expense",
+      date: new Date().toISOString().split("T")[0],
+    },
+  });
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2 className="text-lg font-semibold mb-4">
-        {initialData ? "Editar transação" : "Nova transação"}
-      </h2>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="title" className="text-right text-white">
-            Título
-          </Label>
-          <Input
-            id="title"
-            className="col-span-3 bg-[#121214] border-[#323238] text-white"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="amount" className="text-right text-white">
-            Valor
-          </Label>
-          <Input
-            id="amount"
-            type="number"
-            step="0.01"
-            className="col-span-3 bg-[#121214] border-[#323238] text-white"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-          />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="category" className="text-right text-white">
-            Categoria
-          </Label>
-          <Input
-            id="category"
-            className="col-span-3 bg-[#121214] border-[#323238] text-white"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-          />
-        </div>
-        <RadioGroup
-          value={type}
-          onValueChange={(value: "income" | "expense") => setType(value)}
-          className="grid grid-cols-2 gap-4"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="income" id="income" />
-            <Label htmlFor="income" className="text-white">
-              Receita
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="expense" id="expense" />
-            <Label htmlFor="expense" className="text-white">
-              Despesa
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-      <DialogFooter>
-        <Button type="submit" className="w-full mt-4" disabled={false}>
-          {initialData ? "Salvar alterações" : "Cadastrar"}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Título</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="amount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Valor</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  step="0.01"
+                  {...field}
+                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Categoria</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tipo</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="income">Receita</SelectItem>
+                  <SelectItem value="expense">Despesa</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Data</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" className="w-full">
+          {initialData ? "Atualizar" : "Adicionar"} Transação
         </Button>
-      </DialogFooter>
-    </form>
+      </form>
+    </Form>
   );
-}
+};
+
+export default TransactionForm;

@@ -14,8 +14,6 @@ interface ConfirmationModalProps {
   onConfirm: () => void;
   title: string;
   message: string;
-  confirmText: string;
-  cancelText: string;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -24,8 +22,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onConfirm,
   title,
   message,
-  confirmText,
-  cancelText,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -40,13 +36,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             onClick={onClose}
             className="bg-[#323238] text-white hover:bg-[#29292E]"
           >
-            {cancelText}
+            Cancelar
           </Button>
           <Button
             onClick={onConfirm}
             className="bg-[#00875F] hover:bg-[#015F43] text-white"
           >
-            {confirmText}
+            Confirmar
           </Button>
         </DialogFooter>
       </DialogContent>

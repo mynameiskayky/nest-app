@@ -7,4 +7,10 @@ export interface Transaction {
   createdAt: string;
 }
 
-export type TransactionFormData = Omit<Transaction, "id" | "createdAt">;
+export interface TransactionFormData {
+  title: string;
+  amount: number;
+  category: string;
+  type: "income" | "expense";
+  date: string;
+}

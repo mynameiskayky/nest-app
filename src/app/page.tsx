@@ -17,6 +17,7 @@ import { Transaction, TransactionFormData } from "@/types/transactions";
 import { useSwipeable } from "react-swipeable";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import CSVImport from "@/components/CSVImport";
 
 // Registrar o plugin ScrollTrigger
 const isBrowser = typeof window !== "undefined";
@@ -229,23 +230,25 @@ export default function DTMoney() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] text-[#F5F5F7] p-4 sm:p-6 md:p-8 font-sans">
       <Header>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#00A868] hover:bg-[#008C56] text-white rounded-full px-4 sm:px-6 py-2 sm:py-3 transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm font-medium">
-              <PlusIcon
-                className="mr-2 h-3 w-3 sm:h-4 sm:w-4"
-                aria-hidden="true"
+        <div className="flex space-x-2">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#00A868] hover:bg-[#008C56] text-white rounded-full px-4 sm:px-6 py-2 sm:py-3 transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm font-medium">
+                <PlusIcon
+                  className="mr-2 h-3 w-3 sm:h-4 sm:w-4"
+                  aria-hidden="true"
+                />
+                <span>Nova transação</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-[#2C2C2E] border-[#3A3A3C] rounded-2xl w-[90vw] max-w-md">
+              <TransactionForm
+                onSubmit={handleSubmitTransaction}
+                initialData={editingTransaction}
               />
-              <span>Nova transação</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-[#2C2C2E] border-[#3A3A3C] rounded-2xl w-[90vw] max-w-md">
-            <TransactionForm
-              onSubmit={handleSubmitTransaction}
-              initialData={editingTransaction}
-            />
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </Header>
 
       <SummaryCards income={income} expenses={expenses} />
@@ -253,12 +256,15 @@ export default function DTMoney() {
       <SearchBar />
 
       <section className="mt-8 sm:mt-12" aria-labelledby="transactions-title">
-        <h2
-          id="transactions-title"
-          className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6 text-[#F5F5F7]"
-        >
-          Transações
-        </h2>
+        <header className="flex justify-between items-center">
+          <h2
+            id="transactions-title"
+            className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6 text-[#F5F5F7]"
+          >
+            Transações
+          </h2>
+          <CSVImport />
+        </header>
         {filteredTransactions.length === 0 ? (
           <div className="space-y-4">
             {[...Array(3)].map((_, index) => (

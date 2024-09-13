@@ -34,6 +34,7 @@ interface TransactionContextType {
   filters: FilterOptions;
   updateFilters: (newFilters: Partial<FilterOptions>) => void;
   categories: string[];
+  deleteAllTransactions: () => Promise<void>;
 }
 
 interface FilterOptions {
@@ -67,7 +68,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     type: "all",
     category: "",
   });
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>(["Outros"]);
 
   const fetchTransactions = async () => {
     try {
@@ -99,10 +100,18 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(transaction),
       });
-      if (!response.ok) throw new Error("Falha ao adicionar transação");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          `Falha ao adicionar transação: ${
+            errorData.error || response.statusText
+          }`
+        );
+      }
       await fetchTransactions();
     } catch (error) {
       console.error("Erro ao adicionar transação:", error);
+      throw error; // Re-throw the error to be caught in the CSVImport component
     }
   };
 
@@ -159,22 +168,39 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     setFilteredTransactions(filtered);
   }, [transactions, searchTerm, filters]);
 
+  const deleteAllTransactions = async () => {
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Falha ao excluir todas as transações");
+      }
+      setTransactions([]);
+      setFilteredTransactions([]);
+    } catch (error) {
+      console.error("Erro ao excluir todas as transações:", error);
+      throw error;
+    }
+  };
+
+  const value = {
+    transactions,
+    filteredTransactions,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+    refreshTransactions,
+    searchTerm,
+    updateSearchTerm,
+    filters,
+    updateFilters,
+    categories,
+    deleteAllTransactions,
+  };
+
   return (
-    <TransactionContext.Provider
-      value={{
-        transactions,
-        filteredTransactions,
-        addTransaction,
-        updateTransaction,
-        deleteTransaction,
-        refreshTransactions,
-        searchTerm,
-        updateSearchTerm,
-        filters,
-        updateFilters,
-        categories,
-      }}
-    >
+    <TransactionContext.Provider value={value}>
       {children}
     </TransactionContext.Provider>
   );

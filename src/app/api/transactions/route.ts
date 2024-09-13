@@ -81,22 +81,23 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
-    if (!id) {
-      return NextResponse.json(
-        { error: "ID da transação não fornecido" },
-        { status: 400 }
-      );
+    if (id) {
+      // Deletar uma transação específica
+      await prisma.transaction.delete({
+        where: { id },
+      });
+      return NextResponse.json({ message: "Transação deletada com sucesso" });
+    } else {
+      // Deletar todas as transações
+      await prisma.transaction.deleteMany({});
+      return NextResponse.json({
+        message: "Todas as transações foram deletadas com sucesso",
+      });
     }
-
-    await prisma.transaction.delete({
-      where: { id },
-    });
-
-    return NextResponse.json({ message: "Transação deletada com sucesso" });
   } catch (error) {
-    console.error("Erro ao deletar transação:", error);
+    console.error("Erro ao deletar transação(ões):", error);
     return NextResponse.json(
-      { error: "Erro ao deletar transação" },
+      { error: "Erro ao deletar transação(ões)" },
       { status: 500 }
     );
   }

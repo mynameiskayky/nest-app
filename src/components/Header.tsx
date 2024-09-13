@@ -55,23 +55,23 @@ export default function Header({ children }: HeaderProps) {
     <>
       <header
         ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-4 transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-50 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-8 py-3 sm:py-4 transition-all duration-300"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-[#00875F] rounded-full flex items-center justify-center overflow-hidden">
-            <span className="text-white font-bold text-xl">S</span>
+        <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#00875F] rounded-full flex items-center justify-center overflow-hidden">
+            <span className="text-white font-bold text-lg sm:text-xl">S</span>
           </div>
-          <h1 className="text-2xl font-bold text-white">StoneCO</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">StoneCO</h1>
         </div>
-        <nav ref={linksRef} className="flex gap-8">
+        <nav ref={linksRef} className="flex gap-4 sm:gap-8 mb-2 sm:mb-0">
           <NavLink href="/">dashboard</NavLink>
           <NavLink href="/investments">investimentos</NavLink>
           <NavLink href="/reports">relatórios</NavLink>
           <NavLink href="/settings">configurações</NavLink>
         </nav>
-        <div className="flex items-center gap-4">{children}</div>
+        <div className="flex items-center gap-2 sm:gap-4">{children}</div>
       </header>
-      <div className="h-[72px]"></div>
+      <div className="h-[120px] sm:h-[72px]"></div>
     </>
   );
 }

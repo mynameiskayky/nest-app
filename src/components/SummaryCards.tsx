@@ -12,25 +12,29 @@ export default function SummaryCards({ income, expenses }: SummaryCardsProps) {
   const total = income - expenses;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 sm:mb-8">
       <SummaryCard
         title="Entradas"
         value={income}
-        icon={<ArrowUpIcon className="h-5 w-5 text-emerald-400" />}
+        icon={
+          <ArrowUpIcon className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
+        }
         startColor="#0f766e"
         endColor="#10b981"
       />
       <SummaryCard
         title="Saídas"
         value={expenses}
-        icon={<ArrowDownIcon className="h-5 w-5 text-rose-400" />}
+        icon={<ArrowDownIcon className="h-4 w-4 sm:h-5 sm:w-5 text-rose-400" />}
         startColor="#9f1239"
         endColor="#f43f5e"
       />
       <SummaryCard
         title="Total"
         value={total}
-        icon={<DollarSignIcon className="h-5 w-5 text-blue-400" />}
+        icon={
+          <DollarSignIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
+        }
         startColor="#1e40af"
         endColor="#3b82f6"
       />
@@ -118,14 +122,14 @@ function SummaryCard({
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/10 z-0" />
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-        <CardTitle className="text-sm font-medium text-gray-200 transition-colors">
+        <CardTitle className="text-xs sm:text-sm font-medium text-gray-200 transition-colors">
           {title}
         </CardTitle>
-        <div className="p-2 rounded-full bg-white/10">{icon}</div>
+        <div className="p-1 sm:p-2 rounded-full bg-white/10">{icon}</div>
       </CardHeader>
       <CardContent className="relative z-10">
         <div
-          className="text-3xl font-bold text-gray-100 transition-colors"
+          className="text-xl sm:text-3xl font-bold text-gray-100 transition-colors"
           ref={valueRef}
         >
           {formatCurrency(0)}

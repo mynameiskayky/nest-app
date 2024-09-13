@@ -15,6 +15,7 @@ export async function PUT(
     });
     return NextResponse.json(updatedTransaction);
   } catch (error) {
+    console.error("Erro ao atualizar transação:", error);
     return NextResponse.json(
       { error: "Erro ao atualizar transação" },
       { status: 500 }
@@ -34,6 +35,7 @@ export async function DELETE(
     });
     return NextResponse.json({ message: "Transação excluída com sucesso" });
   } catch (error) {
+    console.error("Erro ao excluir transação:", error);
     return NextResponse.json(
       { error: "Erro ao excluir transação" },
       { status: 500 }

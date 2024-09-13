@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { TransactionFormData } from "@/types/transactions";
 import { useTransactionContext } from "@/contexts/TransactionContext";
+import { useCompletion } from "ai/react";
 
 const formSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
@@ -40,6 +41,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   initialData,
 }) => {
   const { categories } = useTransactionContext();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(formSchema),
@@ -51,6 +53,36 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
       date: new Date().toISOString().split("T")[0],
     },
   });
+
+  const { complete } = useCompletion({
+    api: "/api/ai-categorize",
+  });
+
+  const handleAIProcessing = async () => {
+    setIsProcessing(true);
+    const title = form.getValues("title");
+    const amount = form.getValues("amount");
+
+    try {
+      const result =
+        (await complete(
+          `Categorize a seguinte transação: Título: ${title}, Valor: ${amount}`
+        )) || "{}";
+      const aiSuggestion = JSON.parse(result);
+
+      form.setValue("category", aiSuggestion.category ?? "");
+      form.setValue("type", aiSuggestion.type);
+
+      // Tratar o título se necessário
+      if (aiSuggestion.treatedTitle) {
+        form.setValue("title", aiSuggestion.treatedTitle);
+      }
+    } catch (error) {
+      console.error("Erro ao processar com IA:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <Form {...form}>
@@ -148,6 +180,15 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
             </FormItem>
           )}
         />
+
+        <Button
+          type="button"
+          onClick={handleAIProcessing}
+          disabled={isProcessing}
+          className="w-full mb-4"
+        >
+          {isProcessing ? "Processando..." : "Processar com IA"}
+        </Button>
 
         <Button type="submit" className="w-full">
           {initialData ? "Atualizar" : "Adicionar"} Transação

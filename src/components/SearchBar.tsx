@@ -14,10 +14,9 @@ export default function SearchBar() {
   const { searchTerm, filters, updateSearchTerm, updateFilters, categories } =
     useTransactionContext();
   const debouncedUpdateSearchTerm = useDebounce(
-    // @ts-ignore
     (term: string) => updateSearchTerm(term),
     500
-  ) as (term: string) => void;
+  ) as unknown as (term: string) => void;
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

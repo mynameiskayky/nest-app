@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DialogFooter } from "@/components/ui/dialog";
+import { Transaction, TransactionFormData } from "@/types/transactions";
 
 type TransactionFormProps = {
   onSubmit: (data: TransactionFormData) => void;

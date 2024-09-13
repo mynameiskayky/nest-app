@@ -79,7 +79,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
       // Extrair categorias únicas das transações
       const uniqueCategories = Array.from(
         new Set(data.map((t: Transaction) => t.category))
-      );
+      ) as string[];
       setCategories(uniqueCategories);
     } catch (error) {
       console.error("Erro ao buscar transações:", error);

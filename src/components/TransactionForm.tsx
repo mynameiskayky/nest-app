@@ -22,8 +22,7 @@ import {
 import { TransactionFormData } from "@/types/transactions";
 import { useTransactionContext } from "@/contexts/TransactionContext";
 import { useCompletion } from "ai/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, DollarSign, Calendar, Tag, Type } from "lucide-react";
 
 const formSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
@@ -83,7 +82,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
       form.setValue("category", aiSuggestion.category ?? "");
       form.setValue("type", aiSuggestion.type);
 
-      // Tratar o título se necessário
       if (aiSuggestion.treatedTitle) {
         form.setValue("title", aiSuggestion.treatedTitle);
       }
@@ -95,36 +93,37 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">
-          {initialData ? "Editar Transação" : "Nova Transação"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-medium">Título</FormLabel>
-                  <FormControl>
-                    <Input {...field} className="w-full" />
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Título</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input {...field} className="w-full pl-10 border-white" />
+                    <Tag
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={18}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-medium">Valor</FormLabel>
-                  <FormControl>
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Valor</FormLabel>
+                <FormControl>
+                  <div className="relative">
                     <Input
                       type="number"
                       step="0.01"
@@ -132,107 +131,126 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                       onChange={(e) =>
                         field.onChange(parseFloat(e.target.value))
                       }
-                      className="w-full"
+                      className="w-full pl-10 border-white"
                     />
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+                    <DollarSign
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={18}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-medium">Categoria</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione uma categoria" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-medium">Tipo</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione o tipo" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="income">Receita</SelectItem>
-                      <SelectItem value="expense">Despesa</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-medium">Data</FormLabel>
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Categoria</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
-                    <Input type="date" {...field} className="w-full" />
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
                   </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
 
-            <Button
-              type="button"
-              onClick={handleAIProcessing}
-              disabled={isProcessing}
-              className="w-full mb-4 bg-blue-500 hover:bg-blue-600 text-white"
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processando...
-                </>
-              ) : (
-                "Processar com IA"
-              )}
-            </Button>
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Tipo</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione o tipo" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="income">Receita</SelectItem>
+                    <SelectItem value="expense">Despesa</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
 
-            <Button
-              type="submit"
-              className="w-full bg-green-500 hover:bg-green-600 text-white"
-            >
-              {initialData ? "Atualizar" : "Adicionar"} Transação
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Data</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      type="date"
+                      {...field}
+                      className="w-full pl-10 border-white"
+                    />
+                    <Calendar
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={18}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="pt-4 flex flex-col sm:flex-row gap-4">
+          <Button
+            type="button"
+            onClick={handleAIProcessing}
+            disabled={isProcessing}
+            className="flex-1 bg-neutral-700 hover:bg-neutral-800 text-white transition-colors duration-200"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              <>
+                <Type className="mr-2 h-4 w-4" />
+                Processar com IA
+              </>
+            )}
+          </Button>
+
+          <Button
+            type="submit"
+            className="flex-1 bg-green-500 hover:bg-green-600 text-white transition-colors duration-200"
+          >
+            {initialData ? "Atualizar" : "Adicionar"} Transação
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 

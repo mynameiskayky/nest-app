@@ -11,7 +11,6 @@ export default function Header({ children }: HeaderProps) {
   const headerRef = useRef<HTMLElement>(null);
   const linksRef = useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { refreshTransactions } = useTransactionContext();
 
   useEffect(() => {
     const header = headerRef.current;

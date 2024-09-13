@@ -41,13 +41,18 @@ const CSVImport: React.FC = () => {
         complete: async (results) => {
           const transactions: TransactionFormData[] = results.data
             .slice(1)
-            .map((row: any) => ({
-              title: row[3],
-              amount: parseFloat(row[1]),
-              date: new Date(row[0]),
-              category: "",
-              type: parseFloat(row[1]) > 0 ? "income" : "expense",
-            }));
+            .map((row: unknown) => {
+              if (Array.isArray(row)) {
+                return {
+                  title: row[3],
+                  amount: parseFloat(row[1]),
+                  date: new Date(row[0]).toISOString(),
+                  category: "",
+                  type: parseFloat(row[1]) > 0 ? "income" : "expense",
+                };
+              }
+              throw new Error("Row is not of type string[]");
+            });
 
           for (const transaction of transactions) {
             const processedTransaction = await processTransactionWithAI(

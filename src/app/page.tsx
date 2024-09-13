@@ -276,12 +276,9 @@ export default function DTMoney() {
           </div>
         ) : (
           <ul ref={listRef} className="space-y-4">
-            {filteredTransactions.map((transaction, index) => (
+            {filteredTransactions.map((transaction) => (
               <li
                 key={transaction.id}
-                ref={(el) => {
-                  if (el) itemsRef.current[index] = el;
-                }}
                 {...(isMobile ? swipeHandlers : {})}
                 data-id={transaction.id}
                 className={`bg-[#2C2C2E] p-4 rounded-xl flex flex-col shadow-sm transition-all duration-300 relative overflow-hidden
@@ -362,8 +359,6 @@ export default function DTMoney() {
         onConfirm={handleConfirmDelete}
         title="Excluir transação"
         message="Tem certeza que deseja excluir esta transação?"
-        confirmText="Excluir"
-        cancelText="Cancelar"
       />
     </div>
   );

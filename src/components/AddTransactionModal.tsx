@@ -14,7 +14,9 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { useToast } from "@/hooks/use-toast";
 import { useTransactionContext } from "@/contexts/TransactionContext";
 
-const AddTransactionModal: React.FC = () => {
+const AddTransactionModal: React.FC<{ buttonText?: string }> = ({
+  buttonText = "Nova transação",
+}) => {
   const [open, setOpen] = React.useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
@@ -55,7 +57,7 @@ const AddTransactionModal: React.FC = () => {
       <DialogTrigger asChild>
         <Button className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white rounded-full px-4 sm:px-6 py-2 sm:py-3 transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm font-medium">
           <PlusIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
-          <span>Nova transação</span>
+          <span>{buttonText}</span>
         </Button>
       </DialogTrigger>
       <DialogContent

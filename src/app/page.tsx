@@ -1,15 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { PlusIcon, PencilIcon, TrashIcon } from "lucide-react";
+import { PencilIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import TransactionForm from "@/components/TransactionForm";
 import Header from "@/components/Header";
 import SummaryCards from "@/components/SummaryCards";
 import SearchBar from "@/components/SearchBar";
 import { useTransactionContext } from "@/contexts/TransactionContext";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -18,6 +15,7 @@ import { useSwipeable } from "react-swipeable";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import CSVImport from "@/components/CSVImport";
+import EmptyTransactionsState from "@/components/EmptyTransactionsState";
 
 // Registrar o plugin ScrollTrigger
 const isBrowser = typeof window !== "undefined";
@@ -213,27 +211,7 @@ export default function DTMoney() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] text-[#F5F5F7] p-4 sm:p-6 md:p-8 font-sans">
-      <Header>
-        <div className="flex space-x-2">
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-[#00A868] hover:bg-[#008C56] text-white rounded-full px-4 sm:px-6 py-2 sm:py-3 transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm font-medium">
-                <PlusIcon
-                  className="mr-2 h-3 w-3 sm:h-4 sm:w-4"
-                  aria-hidden="true"
-                />
-                <span>Nova transação</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-[#2C2C2E] border-[#3A3A3C] rounded-2xl w-[90vw] max-w-md">
-              <TransactionForm
-                onSubmit={handleSubmitTransaction}
-                initialData={editingTransaction}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
-      </Header>
+      <Header />
 
       <SummaryCards income={income} expenses={expenses} />
 
@@ -250,14 +228,7 @@ export default function DTMoney() {
           <CSVImport />
         </header>
         {filteredTransactions.length === 0 ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, index) => (
-              <Skeleton
-                key={index}
-                className="h-20 sm:h-24 w-full bg-[#3A3A3C] rounded-xl"
-              />
-            ))}
-          </div>
+          <EmptyTransactionsState />
         ) : (
           <ul ref={listRef} className="space-y-4">
             {filteredTransactions.map((transaction) => (

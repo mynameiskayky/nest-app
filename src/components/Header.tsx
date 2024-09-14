@@ -2,20 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import AddTransactionModal from "@/components/AddTransactionModal";
-import { TransactionFormData } from "@/types/transactions";
 
-type HeaderProps = {
-  children: React.ReactNode;
-};
-
-export default function Header({ children }: HeaderProps) {
+export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
   const linksRef = useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
-
-  const handleSubmit = (transaction: TransactionFormData) => {
-    console.log(transaction);
-  };
 
   useEffect(() => {
     const header = headerRef.current;

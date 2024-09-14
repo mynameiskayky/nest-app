@@ -1,24 +1,53 @@
 import React from "react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import TransactionForm from "./TransactionForm";
-import { TransactionFormData } from "@/types/transactions";
+import { Transaction, TransactionFormData } from "@/types/transactions";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useToast } from "@/hooks/use-toast";
+import { useTransactionContext } from "@/contexts/TransactionContext";
 
-interface AddTransactionModalProps {
-  onSubmit: (data: TransactionFormData) => void;
-}
-
-const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
-  onSubmit,
-}) => {
+const AddTransactionModal: React.FC = () => {
   const [open, setOpen] = React.useState(false);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
+  const { addTransaction, updateTransaction } = useTransactionContext();
+  const [editingTransaction, setEditingTransaction] =
+    React.useState<Transaction | null>(null);
 
-  const handleSubmit = async (data: TransactionFormData) => {
-    await onSubmit(data);
-    setOpen(false);
+  const handleSubmit = async (transactionData: TransactionFormData) => {
+    try {
+      if (editingTransaction) {
+        await updateTransaction(editingTransaction.id, transactionData);
+        toast({
+          title: "Transação atualizada",
+          description: "A transação foi atualizada com sucesso.",
+          variant: "default",
+        });
+      } else {
+        await addTransaction(transactionData);
+        toast({
+          title: "Transação adicionada",
+          description: "A nova transação foi adicionada com sucesso.",
+          variant: "default",
+        });
+      }
+      setOpen(false);
+      setEditingTransaction(null);
+    } catch (error) {
+      toast({
+        title: "Erro na operação",
+        description: "Não foi possível processar a transação. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -37,10 +66,18 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       >
         <div className={`${isMobile ? "h-full flex flex-col" : ""}`}>
           <div className={`p-6 ${isMobile ? "flex-grow overflow-y-auto" : ""}`}>
-            <h2 className="text-2xl font-bold text-center mb-6">
-              Nova Transação
-            </h2>
-            <TransactionForm onSubmit={handleSubmit} />
+            <DialogTitle className="text-2xl font-bold text-center mb-2">
+              {editingTransaction ? "Editar Transação" : "Nova Transação"}
+            </DialogTitle>
+            <DialogDescription className="text-center text-sm text-gray-500 mb-6">
+              Preencha os detalhes da sua{" "}
+              {editingTransaction ? "transação existente" : "nova transação"}{" "}
+              abaixo.
+            </DialogDescription>
+            <TransactionForm
+              onSubmit={handleSubmit}
+              initialData={editingTransaction}
+            />
           </div>
         </div>
       </DialogContent>

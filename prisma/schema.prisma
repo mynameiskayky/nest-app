@@ -17,7 +17,7 @@ model Transaction {
   id        String   @id @default(cuid())
   title     String
   amount    Float
-  category  String
-  type      String   
+  category  String?
+  type      String
   createdAt DateTime @default(now())
 }

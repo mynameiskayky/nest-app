@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
-import { useTransactionContext } from "@/contexts/TransactionContext";
+import AddTransactionModal from "@/components/AddTransactionModal";
+import { TransactionFormData } from "@/types/transactions";
 
 type HeaderProps = {
   children: React.ReactNode;
@@ -11,6 +12,10 @@ export default function Header({ children }: HeaderProps) {
   const headerRef = useRef<HTMLElement>(null);
   const linksRef = useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleSubmit = (transaction: TransactionFormData) => {
+    console.log(transaction);
+  };
 
   useEffect(() => {
     const header = headerRef.current;
@@ -69,7 +74,9 @@ export default function Header({ children }: HeaderProps) {
           <NavLink href="/reports">relatórios</NavLink>
           <NavLink href="/settings">configurações</NavLink>
         </nav>
-        <div className="flex items-center gap-2 sm:gap-4">{children}</div>
+        <div className="flex items-center gap-2 sm:gap-4">
+          <AddTransactionModal />
+        </div>
       </header>
       <div className="h-[120px] sm:h-[72px]"></div>
     </>

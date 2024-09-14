@@ -6,40 +6,32 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  ReactNode,
 } from "react";
+import { Transaction, TransactionFormData } from "@/types/transactions";
 
-export interface Transaction {
-  id: string;
-  title: string;
-  amount: number;
-  category: string;
-  type: "income" | "expense";
-  createdAt: string;
-}
-
-interface TransactionContextType {
+export type TransactionContextType = {
   transactions: Transaction[];
   filteredTransactions: Transaction[];
-  addTransaction: (
-    transaction: Omit<Transaction, "id" | "createdAt">
-  ) => Promise<void>;
+  categories: string[];
+  addTransaction: (transaction: TransactionFormData) => Promise<void>;
   updateTransaction: (
     id: string,
-    transaction: Partial<Transaction>
+    transaction: TransactionFormData
   ) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
-  refreshTransactions: () => Promise<void>;
-  searchTerm: string;
-  updateSearchTerm: (term: string) => void;
-  filters: FilterOptions;
+  setSearchTerm: (term: string) => void;
+  setFilters: (filters: FilterOptions) => void;
+  addCategory: (category: string) => void;
   updateFilters: (newFilters: Partial<FilterOptions>) => void;
-  categories: string[];
-  deleteAllTransactions: () => Promise<void>;
-}
+  searchTerm: string;
+  filters: FilterOptions;
+  updateSearchTerm: (term: string) => void;
+};
 
 interface FilterOptions {
   type: "all" | "income" | "expense";
-  category: string;
+  category: string | null;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(
@@ -56,7 +48,7 @@ export const useTransactionContext = () => {
   return context;
 };
 
-export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
+export const TransactionProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -68,7 +60,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     type: "all",
     category: "",
   });
-  const [categories, setCategories] = useState<string[]>(["Outros"]);
+  const [categories, setCategories] = useState<string[]>([]);
 
   const fetchTransactions = async () => {
     try {
@@ -184,23 +176,33 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const value = {
+  const addCategory = (category: string) => {
+    setCategories((prevCategories) => {
+      if (!prevCategories.includes(category)) {
+        return [...prevCategories, category];
+      }
+      return prevCategories;
+    });
+  };
+
+  const contextValue: TransactionContextType = {
     transactions,
     filteredTransactions,
+    categories,
     addTransaction,
     updateTransaction,
     deleteTransaction,
-    refreshTransactions,
-    searchTerm,
-    updateSearchTerm,
-    filters,
+    setSearchTerm,
+    setFilters,
+    addCategory,
     updateFilters,
-    categories,
-    deleteAllTransactions,
+    searchTerm,
+    filters,
+    updateSearchTerm,
   };
 
   return (
-    <TransactionContext.Provider value={value}>
+    <TransactionContext.Provider value={contextValue}>
       {children}
     </TransactionContext.Provider>
   );

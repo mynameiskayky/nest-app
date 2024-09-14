@@ -31,7 +31,6 @@ export default function DTMoney() {
     deleteTransaction,
     updateTransaction,
     addTransaction,
-    refreshTransactions,
   } = useTransactionContext();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] =
@@ -113,9 +112,6 @@ export default function DTMoney() {
             marginBottom: 0,
             duration: 0.3,
             ease: "power2.in",
-            onComplete: () => {
-              refreshTransactions();
-            },
           });
         }
       } catch (error) {
@@ -127,12 +123,7 @@ export default function DTMoney() {
       }
     }
     setConfirmationModal({ isOpen: false, transaction: null });
-  }, [
-    confirmationModal.transaction,
-    deleteTransaction,
-    toast,
-    refreshTransactions,
-  ]);
+  }, [confirmationModal.transaction, deleteTransaction, toast]);
 
   const handleSubmitTransaction = useCallback(
     async (transactionData: TransactionFormData) => {
@@ -154,7 +145,6 @@ export default function DTMoney() {
         }
         setIsDialogOpen(false);
         setEditingTransaction(null);
-        await refreshTransactions();
       } catch (error) {
         toast({
           title: "Erro na operação",
@@ -164,13 +154,7 @@ export default function DTMoney() {
         });
       }
     },
-    [
-      editingTransaction,
-      updateTransaction,
-      addTransaction,
-      refreshTransactions,
-      toast,
-    ]
+    [editingTransaction, updateTransaction, addTransaction, toast]
   );
 
   const handleSwipe = useCallback(

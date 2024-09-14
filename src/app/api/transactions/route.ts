@@ -32,11 +32,13 @@ export async function POST(request: Request) {
       );
     }
 
+    const setCategory = category === "" ? null : category;
+
     const transaction = await prisma.transaction.create({
       data: {
         title,
         amount: parsedAmount,
-        category,
+        category: setCategory,
         type,
       },
     });

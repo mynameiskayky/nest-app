@@ -46,10 +46,10 @@ const CSVImport: React.FC = () => {
                 return {
                   title: row[3],
                   amount: parseFloat(row[1]),
-                  date: new Date(row[0]).toISOString(),
+                  date: new Date(row[0]),
                   category: "",
                   type: parseFloat(row[1]) > 0 ? "income" : "expense",
-                };
+                } as TransactionFormData;
               }
               throw new Error("Row is not of type string[]");
             });

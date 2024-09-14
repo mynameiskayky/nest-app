@@ -31,7 +31,10 @@ export default function SearchBar() {
 
   const handleCategoryChange = useCallback(
     (value: string) => {
-      updateFilters({ category: value === "all" ? "" : value });
+      updateFilters({
+        category:
+          value === "all_categories" || value === "unassigned" ? null : value,
+      });
     },
     [updateFilters]
   );
@@ -65,15 +68,22 @@ export default function SearchBar() {
           </SelectContent>
         </Select>
         <Select
-          value={filters.category || "all"}
+          value={
+            filters.category === null
+              ? "unassigned"
+              : filters.category === undefined
+              ? "all_categories"
+              : filters.category
+          }
           onValueChange={handleCategoryChange}
         >
           <SelectTrigger className={`w-full sm:w-[180px] ${commonStyles}`}>
             <SelectValue placeholder="Categoria" />
           </SelectTrigger>
           <SelectContent className="bg-[#202024] border-[#323238] text-white max-h-60 overflow-y-auto">
-            <SelectItem value="all">Todas as Categorias</SelectItem>
-            {categories.map((category) => (
+            <SelectItem value="all_categories">Todas as Categorias</SelectItem>
+            <SelectItem value="unassigned">Sem categoria</SelectItem>
+            {categories?.map((category) => (
               <SelectItem key={category} value={category}>
                 {category}
               </SelectItem>

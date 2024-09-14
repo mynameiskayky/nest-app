@@ -3,6 +3,11 @@ import { useTransactionContext } from "@/contexts/TransactionContext";
 import { Button } from "@/components/ui/button";
 import Papa from "papaparse";
 import { TransactionFormData } from "@/types/transactions";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useCompletion } from "ai/react";
 
 const CSVImport: React.FC = () => {
@@ -80,12 +85,20 @@ const CSVImport: React.FC = () => {
         ref={fileInputRef}
         style={{ display: "none" }}
       />
-      <Button
-        onClick={() => fileInputRef.current?.click()}
-        disabled={isProcessing}
-      >
-        {isProcessing ? "Processando..." : "Importar CSV"}
-      </Button>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isProcessing}
+          >
+            {isProcessing ? "Processando..." : "Importar Transações"}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Importe suas transações de um arquivo CSV</p>
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 };

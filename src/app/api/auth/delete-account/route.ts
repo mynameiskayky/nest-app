@@ -1,32 +1,28 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function DELETE(request: Request) {
+export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || !session.user) {
-      return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
-    }
-
-    const userId = session.user.id;
-
+    // Deletar o usuário
     await prisma.user.delete({
-      where: { id: userId },
+      where: { id: session.user.id },
     });
 
-    return NextResponse.json(
-      { message: "Conta excluída com sucesso" },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Conta deletada com sucesso" });
   } catch (error) {
-    console.error("Erro ao excluir conta:", error);
+    console.error("Erro ao deletar conta:", error);
     return NextResponse.json(
-      { message: "Erro interno do servidor" },
+      { error: "Erro ao deletar conta" },
       { status: 500 }
     );
   } finally {

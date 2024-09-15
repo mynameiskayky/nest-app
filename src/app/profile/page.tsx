@@ -20,6 +20,7 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useTransactionContext } from "@/contexts/TransactionContext";
 import Header from "@/components/Header";
+import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -178,13 +179,7 @@ export default function ProfilePage() {
             </Button>
           </div>
           <div className="pt-4">
-            <Button
-              variant="outline"
-              className="w-full text-red-500 hover:text-red-700"
-              onClick={() => setIsDeleteModalOpen(true)}
-            >
-              Excluir Conta
-            </Button>
+            <DeleteAccountButton />
           </div>
         </CardContent>
       </Card>

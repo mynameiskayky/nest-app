@@ -215,7 +215,7 @@ export default function DTMoney() {
       <SearchBar />
 
       <section className="mt-8 sm:mt-12" aria-labelledby="transactions-title">
-        <header className="flex justify-between items-center">
+        <header className="flex justify-between items-center flex-col sm:flex-row mb-6 sm:mb-0">
           <h2
             id="transactions-title"
             className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6 text-[#F5F5F7]"

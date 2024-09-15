@@ -1,6 +1,5 @@
-import { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Input } from "@/components/ui/input";
-import { useTransactionContext } from "@/contexts/TransactionContext";
 import {
   Select,
   SelectContent,
@@ -8,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTransactionContext } from "@/contexts/TransactionContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
 export default function SearchBar() {
@@ -46,7 +46,7 @@ export default function SearchBar() {
   );
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
       <div className="flex-grow">
         <Input
           className={commonStyles}
@@ -56,9 +56,9 @@ export default function SearchBar() {
           aria-label="Buscar transações"
         />
       </div>
-      <div className="flex gap-4">
+      <div className="flex space-x-4">
         <Select value={filters.type} onValueChange={handleTypeChange}>
-          <SelectTrigger className={`w-full sm:w-[180px] ${commonStyles}`}>
+          <SelectTrigger className={`w-full sm:w-[120px] ${commonStyles}`}>
             <SelectValue placeholder="Tipo" />
           </SelectTrigger>
           <SelectContent className="bg-[#202024] border-[#323238] text-white">
@@ -77,11 +77,11 @@ export default function SearchBar() {
           }
           onValueChange={handleCategoryChange}
         >
-          <SelectTrigger className={`w-full sm:w-[180px] ${commonStyles}`}>
+          <SelectTrigger className={`w-full sm:w-[120px] ${commonStyles}`}>
             <SelectValue placeholder="Categoria" />
           </SelectTrigger>
           <SelectContent className="bg-[#202024] border-[#323238] text-white max-h-60 overflow-y-auto">
-            <SelectItem value="all_categories">Todas as Categorias</SelectItem>
+            <SelectItem value="all_categories">Todas</SelectItem>
             <SelectItem value="unassigned">Sem categoria</SelectItem>
             {categories?.map((category) => (
               <SelectItem key={category} value={category}>

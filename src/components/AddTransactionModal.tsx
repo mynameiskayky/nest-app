@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import TransactionForm from "./TransactionForm";
 import { Transaction, TransactionFormData } from "@/types/transactions";
@@ -14,8 +14,16 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { useToast } from "@/hooks/use-toast";
 import { useTransactionContext } from "@/contexts/TransactionContext";
 
-const AddTransactionModal: React.FC<{ buttonText?: string }> = ({
+interface AddTransactionModalProps {
+  buttonText?: string;
+  buttonVariant?: ButtonProps["variant"];
+  buttonType?: "primary" | "secondary";
+}
+
+const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   buttonText = "Nova transação",
+  buttonVariant = "default",
+  buttonType = "primary",
 }) => {
   const [open, setOpen] = React.useState(false);
   const isMobile = useIsMobile();
@@ -52,10 +60,17 @@ const AddTransactionModal: React.FC<{ buttonText?: string }> = ({
     }
   };
 
+  const buttonClassName = `
+    bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 
+    text-white px-4 sm:px-6 py-2 sm:py-3 transition-all duration-300 
+    text-xs sm:text-sm font-medium
+    ${buttonType === "primary" ? "rounded-full transform hover:scale-105" : ""}
+  `;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white rounded-full px-4 sm:px-6 py-2 sm:py-3 transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm font-medium">
+        <Button variant={buttonVariant} className={buttonClassName}>
           <PlusIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
           <span>{buttonText}</span>
         </Button>

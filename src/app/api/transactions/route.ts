@@ -1,9 +1,29 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getToken } from "next-auth/jwt";
 
-export async function GET() {
+async function getSession(req: NextRequest) {
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+  return token;
+}
+
+export async function GET(req: NextRequest) {
+  const token = await getSession(req);
+  if (!token || !token.sub) {
+    return NextResponse.json(
+      { error: "Não autorizado", token },
+      { status: 401 }
+    );
+  }
+
   try {
     const transactions = await prisma.transaction.findMany({
+      where: {
+        userId: token.sub,
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -19,9 +39,17 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
+  const token = await getSession(req);
+  if (!token || !token.sub) {
+    return NextResponse.json(
+      { error: "Não autorizado", token },
+      { status: 401 }
+    );
+  }
+
   try {
-    const body = await request.json();
+    const body = await req.json();
     const { title, amount, category, type } = body;
 
     const parsedAmount = parseFloat(amount);
@@ -40,6 +68,7 @@ export async function POST(request: Request) {
         amount: parsedAmount,
         category: setCategory,
         type,
+        userId: token.sub,
       },
     });
 

@@ -91,6 +91,8 @@ const CSVImport: React.FC = () => {
           <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={isProcessing}
+            variant="ghost"
+            className="text-white border bg-transparent border-neutral-500 hover:border-neutral-600"
           >
             {isProcessing ? "Processando..." : "Importar Transações"}
           </Button>

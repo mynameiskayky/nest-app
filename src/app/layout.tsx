@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { TransactionProvider } from "@/contexts/TransactionContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Providers } from "@/components/Providers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,16 +24,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="antialiased dark">
-        <TransactionProvider>
-          <TooltipProvider>{children}</TooltipProvider>
-          <Toaster />
-        </TransactionProvider>
+      <body className="bg-background text-foregroun antialiased dark">
+        <Providers>
+          <TransactionProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </TransactionProvider>
+        </Providers>
+        <Toaster />
       </body>
     </html>
   );

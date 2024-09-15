@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { PencilIcon, TrashIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import SummaryCards from "@/components/SummaryCards";
@@ -10,12 +10,17 @@ import { useTransactionContext } from "@/contexts/TransactionContext";
 import { useToast } from "@/hooks/use-toast";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Transaction, TransactionFormData } from "@/types/transactions";
+import { Transaction } from "@/types/transactions";
 import { useSwipeable } from "react-swipeable";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import CSVImport from "@/components/CSVImport";
 import EmptyTransactionsState from "@/components/EmptyTransactionsState";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import AddTransactionModal from "@/components/AddTransactionModal";
+import LoadingScreen from "@/components/LoadingScreen";
+import LoginButton from "@/components/LoginButton";
 
 // Registrar o plugin ScrollTrigger
 const isBrowser = typeof window !== "undefined";
@@ -24,12 +29,11 @@ if (isBrowser) {
 }
 
 export default function DTMoney() {
-  const {
-    filteredTransactions,
-    deleteTransaction,
-    updateTransaction,
-    addTransaction,
-  } = useTransactionContext();
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { filteredTransactions, fetchTransactions, deleteTransaction } =
+    useTransactionContext();
+  const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
@@ -123,38 +127,6 @@ export default function DTMoney() {
     setConfirmationModal({ isOpen: false, transaction: null });
   }, [confirmationModal.transaction, deleteTransaction, toast]);
 
-  const handleSubmitTransaction = useCallback(
-    async (transactionData: TransactionFormData) => {
-      try {
-        if (editingTransaction) {
-          await updateTransaction(editingTransaction.id, transactionData);
-          toast({
-            title: "Transação atualizada",
-            description: "A transação foi atualizada com sucesso.",
-            variant: "default",
-          });
-        } else {
-          await addTransaction(transactionData);
-          toast({
-            title: "Transação adicionada",
-            description: "A nova transação foi adicionada com sucesso.",
-            variant: "default",
-          });
-        }
-        setIsDialogOpen(false);
-        setEditingTransaction(null);
-      } catch (error) {
-        toast({
-          title: "Erro na operação",
-          description:
-            "Não foi possível processar a transação. Tente novamente.",
-          variant: "destructive",
-        });
-      }
-    },
-    [editingTransaction, updateTransaction, addTransaction, toast]
-  );
-
   const handleSwipe = useCallback(
     (transaction: Transaction, direction: "left" | "right") => {
       setSwipedTransactionId(transaction.id);
@@ -209,6 +181,31 @@ export default function DTMoney() {
     .filter((t) => t.type === "expense")
     .reduce((sum, t) => sum + t.amount, 0);
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setTimeout(() => {
+        router.push("/auth");
+      }, 600);
+    } else if (status === "authenticated") {
+      setIsLoading(true);
+    }
+  }, [status, router]);
+
+  const handleLoadingComplete = useCallback(() => {
+    setIsLoading(false);
+    if (session) {
+      fetchTransactions();
+    }
+  }, [session, fetchTransactions]);
+
+  if (status === "loading" || isLoading) {
+    return <LoadingScreen onLoadingComplete={handleLoadingComplete} />;
+  }
+
+  if (!session) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] text-[#F5F5F7] p-4 sm:p-6 md:p-8 font-sans">
       <Header />
@@ -225,7 +222,13 @@ export default function DTMoney() {
           >
             Transações
           </h2>
-          <CSVImport />
+          <div className="flex items-center space-x-4">
+            <CSVImport />
+            <AddTransactionModal
+              buttonText="Nova transação"
+              buttonType="secondary"
+            />
+          </div>
         </header>
         {filteredTransactions.length === 0 ? (
           <EmptyTransactionsState />

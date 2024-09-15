@@ -1,93 +1,87 @@
-import React, { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import gsap from "gsap";
-import AddTransactionModal from "@/components/AddTransactionModal";
+"use client";
 
-export default function Header() {
-  const headerRef = useRef<HTMLElement>(null);
-  const linksRef = useRef<HTMLDivElement>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
+import React, { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { LogOut, Home, CreditCard, User } from "lucide-react";
+import { Logo } from "./Logo";
+
+interface NavLinkProps {
+  href: string;
+  children: React.ReactNode;
+  icon: React.ReactNode;
+  onClick?: () => void;
+}
+
+const Header = () => {
+  const { data: session } = useSession();
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const header = headerRef.current;
-    const links = linksRef.current?.children;
-
-    if (!header || !links) return;
-
-    const tl = gsap.timeline({ paused: true });
-
-    tl.fromTo(
-      header,
-      { y: -100, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
-    );
-
-    tl.fromTo(
-      links,
-      { y: -20, opacity: 0 },
-      { y: 0, opacity: 1, stagger: 0.1, duration: 0.5, ease: "power2.out" },
-      "-=0.4"
-    );
-
-    tl.play();
-
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-      gsap.to(header, {
-        backgroundColor:
-          window.scrollY > 20 ? "rgba(18, 18, 20, 0.8)" : "transparent",
-        boxShadow:
-          window.scrollY > 20 ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "none",
-        duration: 0.3,
-      });
+      setScrolled(window.scrollY > 10);
     };
-
     window.addEventListener("scroll", handleScroll);
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
       <header
-        ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-50 flex flex-col sm:flex-row justify-between items-center px-4 sm:px-8 py-3 sm:py-4 transition-all duration-300"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-[rgba(29,29,31,0.72)] border-b border-[#424245]"
+            : "bg-transparent"
+        } backdrop-blur-[20px]`}
       >
-        <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-0">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#00875F] rounded-full flex items-center justify-center overflow-hidden">
-            <span className="text-white font-bold text-lg sm:text-xl">S</span>
+        <div className="py-8 mx-8 flex justify-between items-center">
+          <Logo />
+
+          <nav className="hidden md:flex space-x-8">
+            <NavLink href="/" icon={<Home size={16} />}>
+              Dashboard
+            </NavLink>
+            <NavLink href="/transactions" icon={<CreditCard size={16} />}>
+              Transações
+            </NavLink>
+            <NavLink href="/profile" icon={<User size={16} />}>
+              Perfil
+            </NavLink>
+          </nav>
+
+          <div className="flex items-center space-x-4">
+            {session && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => signOut()}
+                className="flex items-center space-x-2 p-2 rounded-full text-white"
+              >
+                <LogOut size={18} />
+                <span className="hidden md:inline text-sm">Sair</span>
+              </motion.button>
+            )}
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">StoneCO</h1>
-        </div>
-        <nav ref={linksRef} className="flex gap-4 sm:gap-8 mb-2 sm:mb-0">
-          <NavLink href="/">dashboard</NavLink>
-          <NavLink href="/investments">investimentos</NavLink>
-          <NavLink href="/reports">relatórios</NavLink>
-          <NavLink href="/settings">configurações</NavLink>
-        </nav>
-        <div className="flex items-center gap-2 sm:gap-4">
-          <AddTransactionModal />
         </div>
       </header>
-      <div className="h-[120px] sm:h-[72px]"></div>
+      <div className="h-16 mb-8"></div>
     </>
   );
-}
+};
 
-function NavLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="text-white hover:text-[#00875F] transition-colors duration-300 relative group"
+const NavLink: React.FC<NavLinkProps> = ({ href, children, icon, onClick }) => (
+  <Link href={href}>
+    <motion.a
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors duration-200"
+      onClick={onClick}
     >
-      {children}
-      <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-[#00875F] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out"></span>
-    </Link>
-  );
-}
+      {icon}
+      <span>{children}</span>
+    </motion.a>
+  </Link>
+);
+
+export default Header;

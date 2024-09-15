@@ -60,6 +60,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   transactions  Transaction[]
+  verificationToken String?
 }
 
 model VerificationToken {

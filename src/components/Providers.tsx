@@ -1,8 +1,17 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider as NextAuthSessionProvider } from "next-auth/react";
+import { TransactionProvider } from "@/contexts/TransactionContext";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 import { ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <NextAuthSessionProvider>
+      <TransactionProvider>
+        <TooltipProvider>{children}</TooltipProvider>
+      </TransactionProvider>
+    </NextAuthSessionProvider>
+  );
 }

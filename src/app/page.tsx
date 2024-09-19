@@ -184,7 +184,7 @@ export default function DTMoney() {
   useEffect(() => {
     if (status === "unauthenticated") {
       setTimeout(() => {
-        router.push("/auth");
+        router.push("/auth/signin");
       }, 600);
     } else if (status === "authenticated") {
       setIsLoading(true);

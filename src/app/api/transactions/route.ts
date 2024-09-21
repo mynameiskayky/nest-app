@@ -12,17 +12,14 @@ async function getSession(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const token = await getSession(req);
-  if (!token || !token.sub) {
-    return NextResponse.json(
-      { error: "Não autorizado", token },
-      { status: 401 }
-    );
+  if (!token || !token.userId) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
   try {
     const transactions = await prisma.transaction.findMany({
       where: {
-        userId: token.sub,
+        userId: token.userId,
       },
       orderBy: {
         createdAt: "desc",
@@ -41,11 +38,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const token = await getSession(req);
-  if (!token || !token.sub) {
-    return NextResponse.json(
-      { error: "Não autorizado", token },
-      { status: 401 }
-    );
+  if (!token || !token.userId) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
   try {
@@ -68,7 +62,7 @@ export async function POST(req: NextRequest) {
         amount: parsedAmount,
         category: setCategory,
         type,
-        userId: token.sub,
+        userId: token.userId as string,
       },
     });
 

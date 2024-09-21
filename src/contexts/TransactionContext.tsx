@@ -91,11 +91,7 @@ export const TransactionProvider: React.FC<{ children: ReactNode }> = ({
           now - lastFetchTime.current > CACHE_DURATION)
       ) {
         try {
-          const response = await fetch("/api/transactions", {
-            headers: {
-              Authorization: `Bearer ${session.accessToken}`,
-            },
-          });
+          const response = await fetch("/api/transactions");
           if (!response.ok) {
             throw new Error("Falha ao buscar transações");
           }

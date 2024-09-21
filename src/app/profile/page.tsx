@@ -101,10 +101,7 @@ export default function ProfilePage() {
       <Card>
         <CardHeader className="flex flex-row items-center space-x-4 pb-2">
           <Avatar className="h-20 w-20">
-            <AvatarImage
-              src="/placeholder.svg?height=80&width=80"
-              alt="Foto do perfil"
-            />
+            <AvatarImage src={session.user?.image} alt="Foto do perfil" />
             <AvatarFallback>
               {session.user?.name?.charAt(0) || "U"}
             </AvatarFallback>

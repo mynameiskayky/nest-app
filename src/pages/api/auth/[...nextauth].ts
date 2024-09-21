@@ -46,11 +46,18 @@ export const authOptions: NextAuthOptions = {
           where: { email: user.email ?? "" },
         });
 
-        if (existingUser) return false;
+        if (existingUser || !user.email) return false;
+
+        const newUser = await prisma.user.create({
+          data: {
+            email: user.email,
+            name: user.name,
+          },
+        });
 
         await prisma.account.create({
           data: {
-            userId: user.id,
+            userId: newUser.id,
             type: account.type,
             provider: account.provider,
             providerAccountId: account.providerAccountId,
